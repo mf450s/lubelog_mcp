@@ -6,6 +6,7 @@ AI and MCP are still an evolving technologies, implementations of this project i
 
 ## Pre-requisites
 - AI agent with ability to call tools/external integrations(i.e.: Claude Desktop)
+- Node.js(for npx)
 
 Sample Claude Config:
 
