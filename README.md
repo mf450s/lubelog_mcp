@@ -44,8 +44,10 @@ Inject the following environment variables
 ## Commands Supported
 
 - Retrieve list of vehicles
-- Adds Fuel Record from image of receipt
-- Adds Service/Repair/Upgrade records from invoice
+- Add Fuel Record from image of receipt
+- Add Service/Repair/Upgrade records from invoice
+- Add Odometer record from image of dashboard
+- Get latest odometer reading from vehicle
 - Check status of LubeLogger instance
 
 ## Example Usage
