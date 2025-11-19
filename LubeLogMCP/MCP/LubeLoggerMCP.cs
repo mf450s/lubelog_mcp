@@ -255,5 +255,69 @@ namespace LubeLogMCP.MCP
                 return ex.Message;
             }
         }
+        [McpServerTool, Description("Adds an odometer record.")]
+        public async Task<string> AddOdometerRecord(
+            [Description("id of the vehicle")] int vehicleId,
+            [Description("Date recorded")] DateTime date,
+            [Description("Odometer recorded")] int odometer
+            )
+        {
+            var dataParams = new List<KeyValuePair<string, string>>
+        {
+             new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
+             new KeyValuePair<string, string>("odometer", odometer.ToString())
+        };
+
+            string endpoint = $"{instance}/api/vehicle/odometerrecords/add?vehicleId={vehicleId}";
+
+            var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
+            {
+                Content = new FormUrlEncodedContent(dataParams)
+            };
+            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+            {
+                var authenticationString = $"{username}:{password}";
+                var base64EncodedAuthenticationString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authenticationString));
+                request.Headers.Add("Authorization", "Basic " + base64EncodedAuthenticationString);
+            }
+            try
+            {
+                var httpClient = new HttpClient();
+                var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        [McpServerTool, Description("Gets latest odometer reading for a vehicle.")]
+        public async Task<string> GetLatestOdometer(
+            [Description("id of the vehicle")] int vehicleId
+            )
+        {
+
+            string endpoint = $"{instance}/api/vehicle/odometerrecords/latest?vehicleId={vehicleId}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+            {
+                var authenticationString = $"{username}:{password}";
+                var base64EncodedAuthenticationString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authenticationString));
+                request.Headers.Add("Authorization", "Basic " + base64EncodedAuthenticationString);
+            }
+            try
+            {
+                var httpClient = new HttpClient();
+                var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
     }
 }
