@@ -1,0 +1,9 @@
+---
+
+services:
+  app:
+    image: ghcr.io/hargata/lubelogger_mcp:latest
+    restart: unless-stopped
+    # expose port and/or use serving via traefik
+    ports:
+      - 40150:8080
