@@ -12,11 +12,13 @@ namespace LubeLogMCP.MCP
         private string instance { get; set; }
         private string username { get; set; }
         private string password { get; set; }
-        public LubeLoggerMCP(IConfiguration _config)
+        private readonly IHttpClientFactory _httpClientFactory;
+        public LubeLoggerMCP(IConfiguration _config, IHttpClientFactory httpClientFactory)
         {
             instance = _config["LUBELOG_INSTANCE"] ?? string.Empty;
             username = _config["LUBELOG_USER"] ?? string.Empty;
             password = _config["LUBELOG_PASS"] ?? string.Empty;
+            _httpClientFactory = httpClientFactory;
         }
         [McpServerTool, Description("Gets status of LubeLogger MCP.")]
         public async Task<string> GetLubeLoggerMCPStatus()
@@ -45,7 +47,7 @@ namespace LubeLogMCP.MCP
                 result += Environment.NewLine;
                 try
                 {
-                    var httpClient = new HttpClient();
+                    var httpClient = _httpClientFactory.CreateClient();
                     var serverResponse = await httpClient.SendAsync(request).Result.Content.ReadFromJsonAsync<ServerVersion>();
                     if (!string.IsNullOrWhiteSpace(serverResponse.CurrentVersion))
                     {
@@ -77,7 +79,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadFromJsonAsync<List<Vehicle>>();
                 var resultString = string.Empty;
                 foreach(Vehicle vehicle in result)
@@ -133,7 +135,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
 
                 return result;
@@ -180,7 +182,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
 
                 return result;
@@ -227,7 +229,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
 
                 return result;
@@ -274,7 +276,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
 
                 return result;
@@ -317,7 +319,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
 
                 return result;
@@ -368,7 +370,57 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
+                var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        [McpServerTool, Description("Adds a shop supply record.")]
+        public async Task<string> AddShopSupplyRecord(
+            [Description("Date purchased")] DateTime date,
+            [Description("Description of the supply")] string description,
+            [Description("Quantity purchased")] decimal quantity,
+            [Description("Cost of the supply")] decimal cost,
+            [Description("Part number")] string partNumber,
+            [Description("Part supplier")] string partSupplier,
+            [Description("Any extra fields configured for supplyrecord")] List<ExtraField> extraFields)
+        {
+            var dataParams = new List<KeyValuePair<string, string>>
+        {
+             new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
+             new KeyValuePair<string, string>("description", description),
+             new KeyValuePair<string, string>("partQuantity", quantity.ToString()),
+             new KeyValuePair<string, string>("cost", cost.ToString()),
+             new KeyValuePair<string, string>("partNumber", partNumber),
+             new KeyValuePair<string, string>("partSupplier", partSupplier)
+        };
+
+            for (int i = 0; i < extraFields.Count; i++)
+            {
+                dataParams.Add(new KeyValuePair<string, string>($"extraFields[{i}][name]", extraFields[i].Name));
+                dataParams.Add(new KeyValuePair<string, string>($"extraFields[{i}][value]", extraFields[i].Value));
+            }
+
+            string endpoint = $"{instance}/api/vehicle/supplyrecords/add?vehicleId=0";
+
+            var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
+            {
+                Content = new FormUrlEncodedContent(dataParams)
+            };
+            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+            {
+                var authenticationString = $"{username}:{password}";
+                var base64EncodedAuthenticationString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authenticationString));
+                request.Headers.Add("Authorization", "Basic " + base64EncodedAuthenticationString);
+            }
+            try
+            {
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
 
                 return result;
@@ -395,7 +447,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadAsStringAsync();
 
                 return result;
@@ -422,7 +474,7 @@ namespace LubeLogMCP.MCP
             }
             try
             {
-                var httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient();
                 var result = await httpClient.SendAsync(request).Result.Content.ReadFromJsonAsync<List<ExtraFieldsVM>>();
                 result.RemoveAll(x => x.RecordType != importMode.ToString());
                 var serializedResult = JsonSerializer.Serialize(result);

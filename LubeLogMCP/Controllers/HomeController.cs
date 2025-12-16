@@ -10,13 +10,15 @@ namespace LubeLogMCP.Controllers
         private string instance { get; set; }
         private string username { get; set; }
         private string password { get; set; }
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration _config)
+        public HomeController(ILogger<HomeController> logger, IConfiguration _config, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             instance = _config["LUBELOG_INSTANCE"] ?? string.Empty;
             username = _config["LUBELOG_USER"] ?? string.Empty;
             password = _config["LUBELOG_PASS"] ?? string.Empty;
+            _httpClientFactory = httpClientFactory;
         }
         public async Task<IActionResult> Index()
         {
@@ -43,7 +45,7 @@ namespace LubeLogMCP.Controllers
                 }
                 try
                 {
-                    var httpClient = new HttpClient();
+                    var httpClient = _httpClientFactory.CreateClient();
                     var serverResponse = await httpClient.SendAsync(request).Result.Content.ReadFromJsonAsync<ServerVersion>();
                     if (!string.IsNullOrWhiteSpace(serverResponse.CurrentVersion))
                     {
