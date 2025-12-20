@@ -13,12 +13,14 @@ namespace LubeLogMCP.MCP
         private string username { get; set; }
         private string password { get; set; }
         private readonly IHttpClientFactory _httpClientFactory;
-        public LubeLoggerMCP(IConfiguration _config, IHttpClientFactory httpClientFactory)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public LubeLoggerMCP(IConfiguration _config, IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             instance = _config["LUBELOG_INSTANCE"] ?? string.Empty;
             username = _config["LUBELOG_USER"] ?? string.Empty;
             password = _config["LUBELOG_PASS"] ?? string.Empty;
             _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
         }
         [McpServerTool, Description("Gets status of LubeLogger MCP.")]
         public async Task<string> GetLubeLoggerMCPStatus()
@@ -432,7 +434,12 @@ namespace LubeLogMCP.MCP
         }
         private void AddAuthHeaders(HttpRequestMessage request)
         {
-            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+            //check if we have headers
+            if (_httpContextAccessor.HttpContext?.Request.Headers.TryGetValue("Authorization", out var authHeader) ?? false)
+            {
+                request.Headers.Add("Authorization", authHeader.FirstOrDefault());
+            }
+            else if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
             {
                 var authenticationString = $"{username}:{password}";
                 var base64EncodedAuthenticationString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authenticationString));
