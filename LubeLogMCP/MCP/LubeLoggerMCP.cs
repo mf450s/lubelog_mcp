@@ -3,6 +3,7 @@ using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
+using LubeLogMCP.Extensions;
 
 namespace LubeLogMCP.MCP
 {
@@ -100,8 +101,8 @@ namespace LubeLogMCP.MCP
         {
              new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
              new KeyValuePair<string, string>("odometer", odometer.ToString()),
-             new KeyValuePair<string, string>("fuelConsumed", volume.ToString()),
-             new KeyValuePair<string, string>("cost", cost.ToString()),
+             new KeyValuePair<string, string>("fuelConsumed", volume.ToCommaString()),
+             new KeyValuePair<string, string>("cost", cost.ToCommaString()),
              new KeyValuePair<string, string>("isFillToFull", fillToFull.ToString()),
              new KeyValuePair<string, string>("missedFuelUp", missedFuelUp.ToString()),
         };
@@ -145,7 +146,7 @@ namespace LubeLogMCP.MCP
              new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
              new KeyValuePair<string, string>("odometer", odometer.ToString()),
              new KeyValuePair<string, string>("description", description),
-             new KeyValuePair<string, string>("cost", cost.ToString())
+             new KeyValuePair<string, string>("cost", cost.ToCommaString())
         };
 
             for (int i = 0; i < extraFields.Count; i++)
@@ -187,7 +188,7 @@ namespace LubeLogMCP.MCP
              new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
              new KeyValuePair<string, string>("odometer", odometer.ToString()),
              new KeyValuePair<string, string>("description", description),
-             new KeyValuePair<string, string>("cost", cost.ToString())
+             new KeyValuePair<string, string>("cost", cost.ToCommaString())
         };
 
             for (int i = 0; i < extraFields.Count; i++)
@@ -229,7 +230,7 @@ namespace LubeLogMCP.MCP
              new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
              new KeyValuePair<string, string>("odometer", odometer.ToString()),
              new KeyValuePair<string, string>("description", description),
-             new KeyValuePair<string, string>("cost", cost.ToString())
+             new KeyValuePair<string, string>("cost", cost.ToCommaString())
         };
 
             for (int i = 0; i < extraFields.Count; i++)
@@ -341,7 +342,7 @@ namespace LubeLogMCP.MCP
              new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
              new KeyValuePair<string, string>("description", description),
              new KeyValuePair<string, string>("partQuantity", quantity.ToString()),
-             new KeyValuePair<string, string>("cost", cost.ToString()),
+             new KeyValuePair<string, string>("cost", cost.ToCommaString()),
              new KeyValuePair<string, string>("partNumber", partNumber),
              new KeyValuePair<string, string>("partSupplier", partSupplier)
         };
@@ -386,7 +387,7 @@ namespace LubeLogMCP.MCP
              new KeyValuePair<string, string>("date", date.ToString("yyyy-MM-dd")),
              new KeyValuePair<string, string>("description", description),
              new KeyValuePair<string, string>("partQuantity", quantity.ToString()),
-             new KeyValuePair<string, string>("cost", cost.ToString()),
+             new KeyValuePair<string, string>("cost", cost.ToCommaString()),
              new KeyValuePair<string, string>("partNumber", partNumber),
              new KeyValuePair<string, string>("partSupplier", partSupplier)
         };
