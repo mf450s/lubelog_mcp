@@ -3,6 +3,7 @@ name: Build and Push Image to Dockerhub and GHCR
 on:
   push:
     branches: ["main"]
+    tags: ["*"]
   release:
     types: ["published"]
 
@@ -12,6 +13,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -26,19 +29,20 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: "hargata"
-          password: "${{ secrets.GHCR_PAT }}"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Docker Metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          context: workflow
           images: |
-            hargata/lubelogger_mcp
-            ghcr.io/hargata/lubelogger_mcp
+            ${{ secrets.DH_USER }}/lubelogger_mcp
+            ghcr.io/${{ github.repository_owner }}/lubelogger_mcp
           tags: |
-            type=edge,branch=main
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
             type=ref,event=tag
 
       - name: Build and push
